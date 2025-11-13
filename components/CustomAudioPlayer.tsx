@@ -5,14 +5,15 @@ import { Play, Pause, Volume2, VolumeX } from 'lucide-react'
 
 interface CustomAudioPlayerProps {
   src: string
+  duration?: number // Optional duration prop to avoid metadata loading delay
 }
 
-export function CustomAudioPlayer({ src }: CustomAudioPlayerProps) {
+export function CustomAudioPlayer({ src, duration: initialDuration }: CustomAudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const animationRef = useRef<number | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
+  const [duration, setDuration] = useState(initialDuration || 0)
   const [volume, setVolume] = useState(1)
   const [isMuted, setIsMuted] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
@@ -27,6 +28,13 @@ export function CustomAudioPlayer({ src }: CustomAudioPlayerProps) {
   }, [isDragging, isPlaying])
 
   // Start/stop animation loop when playing state changes
+  // Sync duration when initialDuration prop changes
+  useEffect(() => {
+    if (initialDuration && initialDuration > 0) {
+      setDuration(initialDuration)
+    }
+  }, [initialDuration])
+
   useEffect(() => {
     if (isPlaying) {
       animationRef.current = requestAnimationFrame(updateProgress)
@@ -60,9 +68,14 @@ export function CustomAudioPlayer({ src }: CustomAudioPlayerProps) {
       }
     }
 
+    // Add multiple event listeners for faster metadata loading
     audio.addEventListener('loadedmetadata', updateDuration)
     audio.addEventListener('durationchange', updateDuration)
+    audio.addEventListener('canplay', updateDuration) // Earlier event
     audio.addEventListener('ended', handleEnded)
+
+    // Explicitly load the audio to trigger metadata loading
+    audio.load()
 
     // Immediate check if duration already available
     if (audio.duration && isFinite(audio.duration)) {
@@ -72,6 +85,7 @@ export function CustomAudioPlayer({ src }: CustomAudioPlayerProps) {
     return () => {
       audio.removeEventListener('loadedmetadata', updateDuration)
       audio.removeEventListener('durationchange', updateDuration)
+      audio.removeEventListener('canplay', updateDuration)
       audio.removeEventListener('ended', handleEnded)
     }
   }, [src])

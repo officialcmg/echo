@@ -330,7 +330,10 @@ export default function SharePage() {
               <PlayCircle className="w-6 h-6 text-blue-500" />
               <h2 className="text-xl font-bold">Audio Playback</h2>
             </div>
-            <CustomAudioPlayer src={audioUrl} />
+            <CustomAudioPlayer 
+              src={audioUrl} 
+              duration={data?.aquaData.metadata?.duration || undefined}
+            />
           </div>
         )}
 
