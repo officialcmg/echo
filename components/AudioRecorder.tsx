@@ -627,7 +627,7 @@ export function AudioRecorder() {
               Generate Your Nostr Identity
             </h2>
             <p className="text-gray-300 mb-8 max-w-lg mx-auto leading-relaxed">
-              echo uses Nostr for decentralized witnessing. Your Nostr keypair will be deterministically derived from your wallet signature.
+              useecho uses Nostr for decentralized witnessing. Your Nostr keypair will be deterministically derived from your wallet signature.
             </p>
             
             {hasWallet ? (
