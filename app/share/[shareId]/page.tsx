@@ -24,6 +24,7 @@ export default function SharePage() {
 
   const [data, setData] = useState<ShareData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [loadingStatus, setLoadingStatus] = useState<string>('Loading recording...')
   const [error, setError] = useState<string | null>(null)
   const [verificationResult, setVerificationResult] = useState<any>(null)
   const [isVerifying, setIsVerifying] = useState(false)
@@ -33,6 +34,7 @@ export default function SharePage() {
     try {
       setLoading(true)
       setError(null)
+      setLoadingStatus('Fetching from IPFS...')
       console.log('🔗 Loading shared recording:', shareId)
       
       const response = await fetch(`/api/share/${shareId}`)
@@ -48,6 +50,7 @@ export default function SharePage() {
         throw new Error(errorData.error || 'Recording not found')
       }
       
+      setLoadingStatus('Processing audio...')
       const result = await response.json()
       setData(result)
 
@@ -59,6 +62,7 @@ export default function SharePage() {
       console.log('✅ Recording loaded')
       
       // Auto-verify
+      setLoadingStatus('Verifying authenticity...')
       verifyRecording(result)
       
     } catch (err) {
@@ -262,7 +266,10 @@ export default function SharePage() {
         <main className="container mx-auto px-4 py-16">
           <div className="flex flex-col items-center justify-center min-h-[60vh]">
             <Loader2 className="w-12 h-12 animate-spin text-blue-500 mb-4" />
-            <p className="text-gray-400">Loading recording...</p>
+            <p className="text-gray-400">{loadingStatus}</p>
+            {loadingStatus.includes('IPFS') && (
+              <p className="text-gray-500 text-sm mt-2">This may take a few seconds...</p>
+            )}
           </div>
         </main>
       </>
