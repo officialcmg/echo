@@ -60,9 +60,9 @@ export async function POST(request: NextRequest) {
     console.log('   ✅ Recording saved to database')
     console.log('   🔗 Share ID:', recording.share_id)
 
-    // 6. Return success with share URL
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    const shareUrl = `${appUrl}/share/${recording.share_id}`
+    // 6. Return success with share URL (derive origin from request)
+    const origin = request.nextUrl.origin
+    const shareUrl = `${origin}/share/${recording.share_id}`
 
     return NextResponse.json({
       success: true,
